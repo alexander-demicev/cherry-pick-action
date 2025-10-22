@@ -1,0 +1,85 @@
+# Example workflow file for testing the action from your fork
+# Copy this to your test repository: .github/workflows/cherry-pick.yml
+
+name: Cherry-Pick Automation (Test)
+
+on:
+  pull_request_target:
+    types: [closed, labeled]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  cherry-pick:
+    name: Cherry-pick merged PR
+    runs-on: ubuntu-latest
+    
+    # Only run when PR is actually merged (not just closed)
+    if: github.event.pull_request.merged == true
+    
+    steps:
+      - name: Cherry-pick
+        uses: YOUR_USERNAME/cherry-pick-action@v0.1.0-test
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          
+          # Enable debug logging for testing
+          log_level: debug
+          
+          # Optional: Test in dry-run mode first (no actual PRs created)
+          # dry_run: true
+          
+          # Optional: Test conflict handling
+          # conflict_strategy: placeholder-pr
+          
+          # Optional: Test explicit targets instead of labels
+          # target_branches: |
+          #   release-v1.0
+          #   release-v0.9
+
+---
+
+# TESTING INSTRUCTIONS:
+# 
+# 1. Replace YOUR_USERNAME with your GitHub username
+# 
+# 2. Create test branches in your test repo:
+#    git checkout -b release-v1.0
+#    git push origin release-v1.0
+# 
+# 3. Create a feature PR:
+#    git checkout -b test-feature main
+#    echo "test" > test.txt
+#    git add test.txt
+#    git commit -m "Test feature"
+#    git push origin test-feature
+# 
+# 4. Open PR on GitHub and add label: cherry-pick/release-v1.0
+# 
+# 5. Merge the PR
+# 
+# 6. Watch the Actions tab - you should see the workflow run
+# 
+# 7. Verify a new PR is created targeting release-v1.0
+# 
+# 8. Check source PR has label: cherry-pick/done/release-v1.0
+
+---
+
+# TROUBLESHOOTING:
+# 
+# If the action doesn't run:
+# - Make sure this file is on the default branch (usually main)
+# - Check that the PR was merged, not just closed
+# - Verify the tag v0.1.0-test exists in YOUR_USERNAME/cherry-pick-action
+# 
+# If you get permission errors:
+# - Make sure permissions block is present in the workflow
+# - Try using a Personal Access Token instead of GITHUB_TOKEN
+# 
+# If the action fails:
+# - Check the logs in Actions tab for detailed error messages
+# - Enable log_level: debug for more information
+# - Try dry_run: true to see what would happen without making changes
